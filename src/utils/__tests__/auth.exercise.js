@@ -1,21 +1,71 @@
 // Testing Pure Functions
+import {isPasswordAllowed} from '../auth'
+import cases from 'jest-in-case'
 
-// 💣 remove this todo test (it's only here so you don't get an error about missing tests)
-test.todo('remove me')
+describe('isPasswordAllowed', () => {
+  const allowedPwds = ['!aBc123']
+  const disallowedPwds = {
+    'too short': 'a2c!',
+    'no alphabet characters': '123456',
+    'no numbers': 'ABCdef!',
+    'no uppercase letters': 'abc123!',
+    'no lowercase letters': 'ABC123!',
+    'no non-alphanumeric characters': 'ABCdef123',
+  }
+  describe('Valid password', () => {
+    allowedPwds.forEach((pwd) => {
+      test(`allow ${pwd}`, () => {
+        expect(isPasswordAllowed(pwd)).toBeTruthy()
+      })
+    })
+  })
+  describe('Invalid password', () => {
+    Object.entries(disallowedPwds).forEach(([key, value]) => {
+      test(`disallow - ${key}: ${value}`, () => {
+        expect(isPasswordAllowed(value)).toBeFalsy()
+      })
+    })
+  })
+})
 
-// 🐨 import the function that we're testing
-// 💰 import {isPasswordAllowed} from '../auth'
+cases(
+  'isPasswordAllowed: valid passwords',
+  ({password}) => {
+    expect(isPasswordAllowed(password)).toBe(true)
+  },
+  {
+    'valid password': {
+      password: '!aBc123',
+    },
+  },
+)
+/** Demo fro jest-in-case */
+function casify(obj) {
+  return Object.entries(obj).map(([name, password]) => ({
+    name: `${password} - ${name}`,
+    password,
+  }))
+}
 
-// 🐨 write tests for valid and invalid passwords
-// 💰 here are some you can use:
-//
-// valid:
-// - !aBc123
-//
-// invalid:
-// - a2c! // too short
-// - 123456! // no alphabet characters
-// - ABCdef! // no numbers
-// - abc123! // no uppercase letters
-// - ABC123! // no lowercase letters
-// - ABCdef123 // no non-alphanumeric characters
+cases(
+  'isPasswordAllowed: valid passwords',
+  ({password}) => {
+    expect(isPasswordAllowed(password)).toBe(true)
+  },
+  casify({'valid password': '!aBc123'}),
+)
+
+cases(
+  'isPasswordAllowed: invalid passwords',
+  ({password}) => {
+    expect(isPasswordAllowed(password)).toBe(false)
+  },
+  casify({
+    'too short': 'a2c!',
+    'no letters': '123456!',
+    'no numbers': 'ABCdef!',
+    'no uppercase letters': 'abc123!',
+    'no lowercase letters': 'ABC123!',
+    'no non-alphanumeric characters': 'ABCdef123',
+  }),
+)
