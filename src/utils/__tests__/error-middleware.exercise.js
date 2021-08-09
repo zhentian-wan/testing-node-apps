@@ -1,5 +1,6 @@
 import {UnauthorizedError} from 'express-jwt'
 import errorMiddleware from '../error-middleware'
+import {buildNext, buildRes} from 'utils/generate'
 
 // 🐨 Write a test for the UnauthorizedError case
 // 💰 const error = new UnauthorizedError('some_error_code', {message: 'Some message'})
@@ -8,12 +9,8 @@ import errorMiddleware from '../error-middleware'
 // 🐨 Write a test for the headersSent case
 describe('errorMiddleware', () => {
   test('if res.headersSent, then pass down error', () => {
-    const res = {
-      headersSent: true,
-      json: jest.fn(() => res),
-      status: jest.fn(() => res),
-    }
-    const next = jest.fn()
+    const res = buildRes({headersSent: true})
+    const next = buildNext()
     const error = new Error('error')
     errorMiddleware(error, null, res, next)
     expect(next).toHaveBeenCalledWith(error)
@@ -30,8 +27,8 @@ describe('errorMiddleware', () => {
     })
     // return res itself so that response are chainable
     // res.status().json()
-    const res = {json: jest.fn(() => res), status: jest.fn(() => res)}
-    const next = jest.fn(() => next)
+    const res = buildRes()
+    const next = buildNext()
     errorMiddleware(error, null, res, next)
     expect(next).not.toHaveBeenCalled()
     expect(res.status).toHaveBeenCalledWith(401)
@@ -44,9 +41,9 @@ describe('errorMiddleware', () => {
   })
 
   test('return 500 error', () => {
-    const res = {json: jest.fn(() => res), status: jest.fn(() => res)}
+    const res = buildRes()
     const error = new Error('Server error')
-    const next = jest.fn()
+    const next = buildNext()
     errorMiddleware(error, null, res, next)
     expect(next).not.toHaveBeenCalled()
     expect(res.status).toHaveBeenCalledWith(500)
