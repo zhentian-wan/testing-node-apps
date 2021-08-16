@@ -35,7 +35,7 @@ async function createListItem(req, res) {
   } = req
   const {bookId} = req.body
   if (!bookId) {
-    res.status(400).json({message: `No bookId provided`})
+    res.status(400).json({message: `nwo bookId provided`})
     return
   }
   const [existingListItem] = await listItemsDB.query({ownerId, bookId})
@@ -66,10 +66,10 @@ async function expandBookData(listItem) {
 }
 
 async function expandBookDataMultiple(listItems) {
-  const books = await booksDB.readManyById(listItems.map(li => li.bookId))
-  return listItems.map(listItem => ({
+  const books = await booksDB.readManyById(listItems.map((li) => li.bookId))
+  return listItems.map((listItem) => ({
     ...listItem,
-    book: books.find(book => book.id === listItem.bookId),
+    book: books.find((book) => book.id === listItem.bookId),
   }))
 }
 
